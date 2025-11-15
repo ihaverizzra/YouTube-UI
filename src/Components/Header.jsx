@@ -1,69 +1,72 @@
-/* eslint-disable react/no-unescaped-entities */
 /* eslint-disable no-unused-vars */
 import React, { useState } from 'react';
 import { CgMenuLeftAlt } from "react-icons/cg";
-import { IoNotificationsOutline } from 'react-icons/io5';
 import { RiVideoAddLine } from 'react-icons/ri';
-import YouTubeLogo from '../assets/YouTube_Logo.png';
-import MyPic from '../assets/MyPic.jpg';
 import { useDispatch } from 'react-redux';
 import { toggleMenu } from '../utils/appSlice';
-import { AiFillAudio } from "react-icons/ai";
 import { useNavigate } from 'react-router-dom';
-import SearchBar from './SearchBar';
+import UploadVideo from './UploadVideo';
 
 const Header = () => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const [showUploadModal, setShowUploadModal] = useState(false);
 
-  const [showSearch, setShowSearch] = useState(false);
-
-  const navigate = useNavigate()
-
-  function handleClick() {
+  function handleLogoClick() {
     navigate("/");
   }
 
-  // Function to toggle the side menu
   const toggleMenuHandler = () => {
     dispatch(toggleMenu());
   };
 
+  const handleUploadSuccess = () => {
+    // Refresh the page or update video list
+    navigate("/");
+    window.location.reload(); // Simple refresh to show new video
+  };
+
   return (
-    <nav className='fixed flex justify-between items-center md:mx-auto md:px-[1.35rem] max-sm:px-[0.35rem] max-sm:pr-3 lg:pr-7 md:pr-6 max-sm:mx:auto max-sm:h-[4.6rem] md:h-[3.8rem] bg-white w-[100vw] z-30'>
+    <>
+      <nav className='fixed flex justify-between items-center md:mx-auto md:px-[1.35rem] max-sm:px-[0.35rem] max-sm:pr-3 lg:pr-7 md:pr-6 max-sm:mx:auto max-sm:h-[4.6rem] md:h-[3.8rem] bg-white w-[100vw] z-30 shadow-md'>
+        
+        {/* Logo and Menu Icon */}
+        <div className='flex items-center md:gap-3 max-sm:gap-2'>
+          <div className='p-1 hover:bg-gray-200 hover:rounded-full transition-colors'>
+            <CgMenuLeftAlt 
+              className='text-3xl cursor-pointer text-black md:mt-[1px]' 
+              onClick={toggleMenuHandler} 
+            />
+          </div>
+          <div 
+            onClick={handleLogoClick}
+            className='cursor-pointer flex items-center gap-2'
+          >
+            <div className='bg-gradient-to-r from-red-500 to-red-600 text-white font-bold text-xl px-3 py-1 rounded-lg shadow-lg'>
+              VidHub
+            </div>
+          </div>
+        </div>
 
-      {/* Logo and Menu Icon */}
-      <div className={`${showSearch ? 'max-sm:hidden' : ''} flex items-center md:gap-1 max-sm:gap-1`}>
-        <div className='p-1 hover:bg-gray-200 hover:rounded-full'>
-          <CgMenuLeftAlt className='text-3xl cursor-pointer text-black md:mt-[1px]' onClick={toggleMenuHandler} />
+        {/* Upload Button */}
+        <div className='flex items-center gap-4'>
+          <button
+            onClick={() => setShowUploadModal(true)}
+            className='flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-full font-semibold transition-all hover:shadow-lg max-sm:px-3'
+          >
+            <RiVideoAddLine className='text-xl' />
+            <span className='max-sm:hidden'>Upload</span>
+          </button>
         </div>
-        <img src={YouTubeLogo} alt="YouTubeLogo" className='w-22 h-8 cursor-pointer' onClick={handleClick} />
-      </div>
+      </nav>
 
-      {/* SearchBar Component */}
-      <div className='flex items-center lg:gap-6 md:gap-3 max-sm:mr-5 '>
-        <SearchBar
-          showSearch={showSearch}
-          setShowSearch={setShowSearch}
-        />
-        <div className=' bg-gray-100 cursor-pointer hover:bg-gray-200 rounded-full p-[9.5px] max-sm:hidden '>
-          <AiFillAudio className='text-xl' />
-        </div>
-      </div>
-
-      {/* Notification and User Icons */}
-      <div className='flex items-center gap-6 text-[22px]'>
-        <RiVideoAddLine className='hover:cursor-pointer md:flex hidden text-black' />
-        <div className={`${showSearch ? 'max-sm:hidden' : ''} relative hover:rounded-full hover:bg:gray-200`}>
-          <IoNotificationsOutline className='hover:cursor-pointer relative text-black' />
-          <span className='absolute bottom-3 left-3 text-xs bg-red-600 rounded-full px-1 text-white hover:cursor-pointer'>
-            9+
-          </span>
-        </div>
-        <div className={`w-8 h-9 hover:cursor-pointer`}>
-          <img className='rounded-full' src={MyPic} alt="Mypic" />
-        </div>
-      </div>
-    </nav>
+      {/* Upload Modal */}
+      <UploadVideo
+        isOpen={showUploadModal}
+        onClose={() => setShowUploadModal(false)}
+        onUploadSuccess={handleUploadSuccess}
+      />
+    </>
   );
 };
 
